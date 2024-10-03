@@ -1,0 +1,64 @@
+/* styles.css */
+body {
+    background-color: #f8f9fa;
+    font-family: "Poppins", sans-serif;
+}
+
+h2 {
+    color: #007bff;
+}
+
+.table {
+    margin-top: 20px;
+    border: 1px solid #dee2e6;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+#saldo {
+    color: white;
+    font-weight: bold;
+}
+
+tr input {
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    text-align: center;
+}
+
+tr input::placeholder {
+    color: black;
+}
+
+tr select {
+    border: none;
+    outline: none;
+    background: none;
+}
+
+.positivo {
+    background: green !important;
+}
+
+.negativo {
+    background: red !important;
+}
+
+.deletarLinha {
+    display: flex;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
