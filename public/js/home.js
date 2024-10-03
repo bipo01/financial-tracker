@@ -26,7 +26,7 @@ document.addEventListener("click", async (e) => {
             console.log(categoriaEd);
 
             const response = await fetch(
-                `http://localhost:3000/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
+                `https://financial-tracker-zeta.vercel.app/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
             );
             const data = await response.json();
             console.log(data);
