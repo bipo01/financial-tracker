@@ -11,7 +11,7 @@ const port = 3000;
 
 const db = new pg.Client({
     connectionString:
-        "postgres://fkctaqda:rFhK_a8jIjRwhlZQaDnr9zCNFzCT-SHO@salt.db.elephantsql.com/fkctaqda",
+        "postgres://default:Ef7gRnhwbD9B@ep-bold-limit-a48ldweb.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require",
 });
 db.connect();
 
