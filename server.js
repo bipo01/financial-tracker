@@ -113,7 +113,7 @@ app.post("/add", (req, res) => {
         [tipo, valor, categoria, data, req.session.user.id]
     );
 
-    res.redirect("/home");
+    return res.redirect("/home");
 });
 
 app.post("/deletar", (req, res) => {
