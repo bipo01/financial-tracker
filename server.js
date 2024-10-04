@@ -10,6 +10,11 @@ const app = express();
 const port = 3000;
 
 const db = new pg.Client({
+    // user: "postgres",
+    // password: "JSBispo121511!",
+    // database: "projetos",
+    // host: "localhost",
+    // port: 5432,
     connectionString:
         "postgres://default:Ef7gRnhwbD9B@ep-bold-limit-a48ldweb.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require",
 });
@@ -102,7 +107,7 @@ app.post("/register", async (req, res) => {
     }
 });
 
-app.post("/add", (req, res) => {
+app.post("/add", async (req, res) => {
     const tipo = req.body.tipo;
     const valor = req.body.valor;
     const categoria = req.body.categoria;
@@ -113,7 +118,15 @@ app.post("/add", (req, res) => {
         [tipo, valor, categoria, data, req.session.user.id]
     );
 
-    return res.redirect("/home");
+    const result = await db.query(
+        "SELECT * FROM fttabela WHERE user_id = $1 ORDER BY data DESC",
+        [req.session.user.id]
+    );
+    const data1 = result.rows;
+
+    // return res.redirect("/home");
+
+    res.json(data1);
 });
 
 app.post("/deletar", (req, res) => {

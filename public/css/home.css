@@ -46,6 +46,29 @@ tr select {
     background: none;
 }
 
+.filtrar {
+    display: flex;
+    border: 1px solid black;
+    margin: 10px 0;
+    justify-content: space-between;
+    padding: 0.5rem 1.5rem;
+    border-radius: 10px;
+}
+
+.filtro {
+    padding: 0.3rem 1rem;
+    border-radius: 5px;
+}
+
+.filtro:hover {
+    cursor: pointer;
+    background: gray;
+}
+
+.selecionado {
+    background: gainsboro !important;
+}
+
 .positivo {
     background: green !important;
 }
@@ -60,5 +83,9 @@ tr select {
 }
 
 .hidden {
+    display: none !important;
+}
+
+.hidden1 {
     display: none !important;
 }

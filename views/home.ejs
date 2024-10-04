@@ -20,7 +20,7 @@
     <body>
         <div class="container my-5">
             <h2 class="mb-4 text-center">Gerenciador Financeiro</h2>
-            <form action="/add" method="post" class="row g-3">
+            <form id="addForm" action="/add" method="post" class="row g-3">
                 <div class="col-md-3">
                     <label for="valor" class="form-label">Valor</label>
                     <input
@@ -85,7 +85,14 @@
                 </div>
             </form>
 
-            <% if (data.length > 0) { %>
+            <% if (data.length > 0) { %> <% data.forEach(el => { %>
+            <div class="allCategorias hidden"><%= el.categoria %></div>
+            <%}) %>
+            <div class="filtrar">
+                <div class="SaídaFiltro filtro selecionado">Saída</div>
+                <div class="EntradaFiltro filtro selecionado">Entrada</div>
+            </div>
+
             <div class="table-responsive mt-5">
                 <table class="table table-striped table-bordered text-center">
                     <thead class="table-dark">
@@ -100,9 +107,11 @@
                         <% data.forEach((el) => { %>
 
                         <tr>
-                            <td class="<%= el.tipo %>"><%= el.tipo %></td>
+                            <td class="tipo <%= el.tipo %>"><%= el.tipo %></td>
                             <td class="valor"><%= el.valor %></td>
-                            <td><%= el.categoria %></td>
+                            <td class="<%= el.categoria %>">
+                                <%= el.categoria %>
+                            </td>
                             <td>
                                 <%= el.data.toLocaleString("pt-br", {year:
                                 "numeric", month: "numeric", day: "numeric"}) %>
@@ -127,11 +136,13 @@
                         </tr>
 
                         <% }) %>
+                    </tbody>
+                    <tfoot>
                         <tr>
                             <td colspan="2">Saldo:</td>
                             <td id="saldo" colspan="3"></td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
             </div>
             <% } else { %>
