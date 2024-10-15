@@ -58,7 +58,30 @@ app.get("/home", async (req, res) => {
     );
     const data = result.rows;
 
-    res.render("home.ejs", { data: data });
+    const months = data.map((el) => el.data.getMonth()).sort((a, b) => a - b);
+    const allMonths = new Set(months);
+
+    const years = data.map((el) => el.data.getFullYear()).sort((a, b) => a - b);
+    const allYears = new Set(years);
+
+    console.log(allYears);
+
+    const monthNames = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+    ];
+
+    res.render("home.ejs", { data: data, allMonths, monthNames, allYears });
 });
 
 app.post("/login", async (req, res) => {
@@ -111,11 +134,23 @@ app.post("/add", async (req, res) => {
     const tipo = req.body.tipo;
     const valor = req.body.valor;
     const categoria = req.body.categoria;
-    const data = req.body.data;
+    const data =
+        req.body.data ||
+        `${new Date().getFullYear()}-${
+            new Date().getMonth() + 1
+        }-${new Date().getDate()}`;
+
+    console.log(data);
 
     db.query(
         "INSERT INTO fttabela (tipo, valor,categoria,data, user_id) VALUES($1,$2,$3,$4,$5)",
-        [tipo, valor, categoria, data, req.session.user.id]
+        [
+            tipo.trim(),
+            valor.trim(),
+            categoria.trim(),
+            data.trim(),
+            req.session.user.id,
+        ]
     );
 
     const result = await db.query(
@@ -124,14 +159,12 @@ app.post("/add", async (req, res) => {
     );
     const data1 = result.rows;
 
-    // return res.redirect("/home");
-
     res.json(data1);
 });
 
 app.post("/deletar", (req, res) => {
     db.query("DELETE FROM fttabela WHERE id = $1", [req.body.idAtual]);
-    return res.redirect("/home");
+    res.json("DELETADO");
 });
 
 app.get("/editar", async (req, res) => {

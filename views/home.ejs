@@ -85,12 +85,29 @@
                 </div>
             </form>
 
-            <% if (data.length > 0) { %> <% data.forEach(el => { %>
-            <div class="allCategorias hidden"><%= el.categoria %></div>
-            <%}) %>
             <div class="filtrar">
                 <div class="SaídaFiltro filtro selecionado">Saída</div>
                 <div class="EntradaFiltro filtro selecionado">Entrada</div>
+            </div>
+
+            <div class="div-classificar">
+                Classificar por:
+                <select id="classificar">
+                    <option value="1">Mais recente</option>
+                    <option value="2">Mais antigo</option>
+                    <option value="3">Maior valor</option>
+                    <option value="4">Menor valor</option>
+                </select>
+            </div>
+
+            <div class="div-visualizar">
+                Visualizar:
+                <select id="visualizarMeses">
+                    <option value="todos">Todos</option>
+                </select>
+                <select id="visualizarAnos">
+                    <option value="todos">Todos</option>
+                </select>
             </div>
 
             <div class="table-responsive mt-5">
@@ -103,21 +120,36 @@
                             <th>Data</th>
                         </tr>
                     </thead>
+
                     <tbody>
+                        <div class="div-categorias">
+                            <% if (data.length > 0) { %> <% data.forEach(el => {
+                            %>
+                            <div class="allCategorias hidden">
+                                <%= el.categoria %>
+                            </div>
+                            <%}) %>
+                        </div>
                         <% data.forEach((el) => { %>
 
-                        <tr>
+                        <tr class="tr<%= el.tipo %>">
                             <td class="tipo <%= el.tipo %>"><%= el.tipo %></td>
                             <td class="valor"><%= el.valor %></td>
                             <td class="<%= el.categoria %>">
                                 <%= el.categoria %>
                             </td>
-                            <td>
+                            <td
+                                class="data mes<%= el.data.getMonth() %> ano<%= el.data.getFullYear() %>"
+                            >
                                 <%= el.data.toLocaleString("pt-br", {year:
                                 "numeric", month: "numeric", day: "numeric"}) %>
                             </td>
                             <td class="deletarLinha">
-                                <form action="/deletar" method="post">
+                                <form
+                                    class="deletarForm"
+                                    action="/deletar"
+                                    method="post"
+                                >
                                     <input
                                         type="hidden"
                                         name="idAtual"
@@ -135,8 +167,9 @@
                             </td>
                         </tr>
 
-                        <% }) %>
+                        <% }) %> <% } %>
                     </tbody>
+
                     <tfoot>
                         <tr>
                             <td colspan="2">Saldo:</td>
@@ -145,9 +178,11 @@
                     </tfoot>
                 </table>
             </div>
-            <% } else { %>
-            <p class="text-center mt-5">Sem dados...</p>
-            <% } %>
+            <canvas
+                class="hidden"
+                id="myChart"
+                style="width: 100%; max-width: 700px"
+            ></canvas>
 
             <a href="/logout">Sair</a>
         </div>
@@ -158,6 +193,7 @@
             crossorigin="anonymous"
         ></script>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
         <script src="/js/home.js"></script>
     </body>
 </html>

@@ -24,7 +24,6 @@ h2 {
 }
 
 #saldo {
-    color: white;
     font-weight: bold;
 }
 
@@ -48,21 +47,39 @@ tr select {
 
 .filtrar {
     display: flex;
-    border: 1px solid black;
     margin: 10px 0;
-    justify-content: space-between;
-    padding: 0.5rem 1.5rem;
+    padding: 1rem 1.5rem;
     border-radius: 10px;
+    max-width: 100%;
+    overflow-x: scroll;
 }
 
 .filtro {
     padding: 0.3rem 1rem;
     border-radius: 5px;
+    min-width: fit-content;
+    margin: 5px;
 }
 
 .filtro:hover {
     cursor: pointer;
     background: gray;
+}
+
+#myChart {
+    background: rgba(156, 194, 236, 0.987);
+    margin: 10px auto;
+    padding: 0.5rem 1.5rem;
+    border-radius: 15px;
+    width: fit-content;
+}
+
+.table-striped > tbody > tr.trEntrada > td {
+    background-color: rgb(144, 237, 144) !important;
+}
+
+.table-striped > tbody > tr.trSaída > td {
+    background-color: rgb(236, 126, 126) !important;
 }
 
 .selecionado {
@@ -71,10 +88,12 @@ tr select {
 
 .positivo {
     background: green !important;
+    color: white !important;
 }
 
 .negativo {
     background: red !important;
+    color: white !important;
 }
 
 .deletarLinha {
@@ -87,5 +106,12 @@ tr select {
 }
 
 .hidden1 {
+    display: none !important;
+}
+
+.hidden2 {
+    display: none !important;
+}
+.hidden3 {
     display: none !important;
 }

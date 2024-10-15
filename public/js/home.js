@@ -1,25 +1,20 @@
 const addForm = document.querySelector("#addForm");
-let allCategorias = document.querySelectorAll(".allCategorias");
-let categoriasArr = [];
-
-allCategorias.forEach((el) => {
-    categoriasArr.push(el.textContent);
-});
-
-categoriasArr.sort();
-
-const categoriasSet = new Set(categoriasArr);
-
-categoriasSet.forEach((el) => {
-    const html = `<div class="filtro selecionado">${el}</div>`;
-    document.querySelector(".filtrar").insertAdjacentHTML("beforeend", html);
-});
+const deletarForm = document.querySelectorAll(".deletarForm");
+let categoriasSet;
+let myChart;
 
 addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new FormData(addForm);
     const urlParams = new URLSearchParams(formData);
+
+    const valor = addForm.querySelector("#valor").value;
+    const categoria = addForm.querySelector("#categoria").value;
+
+    if (!valor.trim() || !categoria.trim()) {
+        return alert("Preencha todos os campos");
+    }
 
     const response = await fetch(
         `https://financial-tracker-zeta.vercel.app/add`,
@@ -36,44 +31,97 @@ addForm.addEventListener("submit", async (e) => {
 
     data.forEach((el) => {
         const date = new Date(el.data);
-        const html = `<tr>
-        <td class="tipo ${el.tipo}">${el.tipo}</td>
-        <td class="valor">${el.valor}</td>
-        <td class="${el.categoria}">${el.categoria}</td>
-        <td>
-             ${date.toLocaleString("pt-br", {
-                 year: "numeric",
-                 month: "numeric",
-                 day: "numeric",
-             })}
-        </td>
-        <td class="deletarLinha">
-            <form action="/deletar" method="post">
-                <input
-                    type="hidden"
-                    name="idAtual"
-                    id="idAtual"
-                    value="${el.id}"
-                />
-                <button type="submit">
-                    <i class="bi bi-trash3-fill"></i>
+        const html = `<tr class="tr${el.tipo}">
+            <td class="tipo ${el.tipo}">${el.tipo}</td>
+            <td class="valor">${el.valor}</td>
+            <td class="${el.categoria}">${el.categoria}</td>
+            <td class="data mes${date.getMonth()} ano${date.getFullYear()}">
+                 ${date.toLocaleString("pt-br", {
+                     year: "numeric",
+                     month: "numeric",
+                     day: "numeric",
+                 })}
+            </td>
+            <td class="deletarLinha">
+                <form class="deletarForm" action="/deletar" method="post">
+                    <input
+                        type="hidden"
+                        name="idAtual"
+                        id="idAtual"
+                        value="${el.id}"
+                    />
+                    <button type="submit">
+                        <i class="bi bi-trash3-fill"></i>
+                    </button>
+                </form>
+    
+                <button class="editarBtn">
+                    <i class="bi bi-pencil-fill"></i>
                 </button>
-            </form>
+            </td>
+        </tr>`;
 
-            <button class="editarBtn">
-                <i class="bi bi-pencil-fill"></i>
-            </button>
-        </td>
-    </tr>`;
+        tbody.insertAdjacentHTML("beforeend", html);
 
-        tbody.insertAdjacentHTML("afterbegin", html);
+        const html1 = `<div class="allCategorias hidden">${el.categoria}</div>`;
+        document
+            .querySelector(".div-categorias")
+            .insertAdjacentHTML("beforeend", html1);
     });
 
     getSaldo();
+    createChart();
+    classificar();
+    setMesesAnos();
     addForm.reset();
 });
 
 document.addEventListener("click", async (e) => {
+    if (e.target.closest("form")?.classList.contains("deletarForm")) {
+        e.preventDefault();
+        const tr = e.target.closest("tr");
+        const idAtual = tr.querySelector("#idAtual").value;
+
+        const formData = new FormData(e.target.closest("form"));
+        const urlParams = new URLSearchParams(formData);
+
+        const response = await fetch(
+            `https://financial-tracker-zeta.vercel.app/deletar`,
+            {
+                method: "post",
+                body: urlParams,
+            }
+        );
+        const data = await response.json();
+
+        tr.remove();
+
+        const categoria = tr.children[2].textContent;
+        document.querySelectorAll(".allCategorias").forEach((el) => {
+            const categoriasExistentes = [];
+            document.querySelectorAll("tbody tr").forEach((element) => {
+                categoriasExistentes.push(
+                    element.children[2].textContent.trim()
+                );
+            });
+
+            if (!categoriasExistentes.includes(el.textContent.trim())) {
+                el.remove();
+            }
+        });
+
+        getSaldo();
+        setCategories();
+        createChart();
+        classificar();
+        setMesesAnos();
+
+        const tbody = document.querySelector("tbody");
+        if (!tbody.children.length) {
+            myChart.destroy();
+            document.querySelector("#myChart").classList.add("hidden");
+        }
+    }
     if (e.target.closest("button")?.classList.contains("editarBtn")) {
         const el = e.target.closest("button");
 
@@ -86,10 +134,10 @@ document.addEventListener("click", async (e) => {
         const tipoAtual = tr.children[0].textContent;
 
         if (tr.classList.contains("editando")) {
-            const tipoEd = tr.querySelector("#tipoEd").value;
-            const dataEd = tr.querySelector("#dataEd").value;
-            const valorEd = tr.querySelector("#valorEd").value;
-            const categoriaEd = tr.querySelector("#categoriaEd").value;
+            const tipoEd = tr.querySelector("#tipoEd").value.trim();
+            const dataEd = tr.querySelector("#dataEd").value.trim();
+            const valorEd = tr.querySelector("#valorEd").value.trim();
+            const categoriaEd = tr.querySelector("#categoriaEd").value.trim();
 
             const response = await fetch(
                 `https://financial-tracker-zeta.vercel.app/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
@@ -98,58 +146,62 @@ document.addEventListener("click", async (e) => {
 
             const date = new Date(data.data);
 
+            tr.classList.remove(...tr.classList);
+            tr.classList.add(`tr${data.tipo}`);
             tr.innerHTML = `<td class="tipo ${data.tipo}">${data.tipo}</td>
-                                <td class="valor">${data.valor}</td>
-                                <td class="${data.categoria}">${
+                                    <td class="valor">${data.valor}</td>
+                                    <td class="${data.categoria}">${
                 data.categoria
             }</td>
-                                <td>
-                                    ${date.toLocaleString("pt-br", {
-                                        year: "numeric",
-                                        month: "numeric",
-                                        day: "numeric",
-                                    })}
-                                </td>
-                                <td class="deletarLinha">
-                                    <form action="/deletar" method="post">
-                                        <input
-                                            type="hidden"
-                                            name="idAtual"
-                                            id="idAtual"
-                                            value="${data.id}"
-                                        />
-                                        <button type="submit">
-                                            <i class="bi bi-trash3-fill"></i>
+                                    <td class="data mes${date.getMonth()} ano${date.getFullYear()}">
+                                        ${date.toLocaleString("pt-br", {
+                                            year: "numeric",
+                                            month: "numeric",
+                                            day: "numeric",
+                                        })}
+                                    </td>
+                                    <td class="deletarLinha">
+                                        <form class="deletarForm" action="/deletar" method="post">
+                                            <input
+                                                type="hidden"
+                                                name="idAtual"
+                                                id="idAtual"
+                                                value="${data.id}"
+                                            />
+                                            <button type="submit">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+        
+                                        <button class="editarBtn">
+                                            <i class="bi bi-pencil-fill"></i>
                                         </button>
-                                    </form>
-    
-                                    <button class="editarBtn">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </button>
-                                </td>`;
+                                    </td>`;
 
             tr.classList.remove("editando");
             getSaldo();
+            createChart();
+            classificar();
             return;
         }
 
         tr.classList.add("editando");
 
         tr.children[0].innerHTML = `
-            <select id="tipoEd">
-                <option value="Entrada" ${
-                    tipoAtual == "Entrada" ? "selected" : ""
-                }>Entrada</option>
-                <option value="Saída" ${
-                    tipoAtual == "Saída" ? "selected" : ""
-                }>Saída</option>
-            </select>
-            `;
+                <select id="tipoEd">
+                    <option value="Entrada" ${
+                        tipoAtual == "Entrada" ? "selected" : ""
+                    }>Entrada</option>
+                    <option value="Saída" ${
+                        tipoAtual == "Saída" ? "selected" : ""
+                    }>Saída</option>
+                </select>
+                `;
         tr.children[1].innerHTML = `<input type="number" id="valorEd" value="${valorAtual}"/>`;
         tr.children[2].innerHTML = `<input type="text" id="categoriaEd" value="${categoriaAtual}"/>`;
         tr.children[3].innerHTML = `
-            <input type="date" id="dataEd" />
-            `;
+                <input type="date" id="dataEd" />
+                `;
 
         el.innerHTML = `<i class="bi bi-check-square-fill"></i>`;
     }
@@ -214,6 +266,7 @@ document.addEventListener("click", async (e) => {
                     });
             }
         }
+        getSaldo();
     }
 });
 
@@ -230,24 +283,42 @@ function getSaldo() {
 
     if (saidas.length > 0) {
         saidas.forEach((el) => {
-            const valor = Number(
-                el.closest("tr").querySelector(".valor").textContent
-            );
-            saidasArr.push(valor);
+            if (
+                !el.closest("tr").classList.contains("hidden") &&
+                !el.closest("tr").classList.contains("hidden1") &&
+                !el.closest("tr").classList.contains("hidden2") &&
+                !el.closest("tr").classList.contains("hidden3")
+            ) {
+                const valor = Number(
+                    el.closest("tr").querySelector(".valor").textContent
+                );
+                saidasArr.push(valor);
+            }
         });
 
-        saidasTotal = saidasArr.reduce((acc, cur) => acc + cur);
+        if (saidasArr.length > 0) {
+            saidasTotal = saidasArr.reduce((acc, cur) => acc + cur);
+        }
     }
 
     if (entradas.length > 0) {
         entradas.forEach((el) => {
-            const valor = Number(
-                el.closest("tr").querySelector(".valor").textContent
-            );
-            entradasArr.push(valor);
+            if (
+                !el.closest("tr").classList.contains("hidden") &&
+                !el.closest("tr").classList.contains("hidden1") &&
+                !el.closest("tr").classList.contains("hidden2") &&
+                !el.closest("tr").classList.contains("hidden3")
+            ) {
+                const valor = Number(
+                    el.closest("tr").querySelector(".valor").textContent
+                );
+                entradasArr.push(valor);
+            }
         });
 
-        entradasTotal = entradasArr.reduce((acc, cur) => acc + cur);
+        if (entradasArr.length > 0) {
+            entradasTotal = entradasArr.reduce((acc, cur) => acc + cur);
+        }
     }
 
     entradasTotal = entradasTotal || 0;
@@ -258,10 +329,277 @@ function getSaldo() {
     if (Number(saldo.textContent) > 0) {
         saldo.classList.remove("negativo");
         saldo.classList.add("positivo");
+    } else if (Number(saldo.textContent) == 0) {
+        saldo.classList.remove("negativo");
+        saldo.classList.remove("positivo");
     } else {
         saldo.classList.add("negativo");
         saldo.classList.remove("positivo");
     }
 }
 
-getSaldo();
+if (document.querySelector("table")) {
+    getSaldo();
+    createChart();
+    setCategories();
+    setMesesAnos();
+}
+
+function createChart() {
+    setCategories();
+    var xValues = [...categoriasSet];
+    var yValues = [];
+
+    categoriasSet.forEach((el) => {
+        const valores = [];
+        document.querySelectorAll(`.${el.trim()}`).forEach((el) => {
+            const tr = el.closest("tr");
+
+            const valor = tr.querySelector(".valor").textContent;
+            valores.push(Number(valor));
+        });
+        const valorTotal = valores.reduce((acc, cur) => {
+            return acc + cur;
+        }, 0);
+        yValues.push(valorTotal);
+    });
+
+    function randomColor() {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        const rgb = `rgb(${r}, ${g}, ${b})`;
+
+        if (barColors.includes(rgb)) {
+            return randomColor();
+        }
+
+        barColors.push(rgb);
+    }
+
+    var barColors = [];
+
+    categoriasSet.forEach((el) => {
+        randomColor();
+    });
+
+    console.log(barColors);
+
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart("myChart", {
+        type: "pie",
+        data: {
+            labels: xValues,
+            datasets: [
+                {
+                    backgroundColor: barColors,
+                    data: yValues,
+                },
+            ],
+        },
+    });
+    const tbody = document.querySelector("tbody");
+
+    document.querySelector("#myChart").classList.remove("hidden");
+
+    if (!tbody.children.length) {
+        myChart.destroy();
+        document.querySelector("#myChart").classList.add("hidden");
+    }
+}
+
+function setCategories() {
+    let allCategorias = document.querySelectorAll(".allCategorias");
+    let categoriasArr = [];
+
+    allCategorias.forEach((el) => {
+        categoriasArr.push(el.textContent.trim());
+    });
+
+    categoriasArr.sort();
+
+    categoriasSet = new Set(categoriasArr);
+
+    document.querySelector(".filtrar").innerHTML = `
+                    <div class="SaídaFiltro filtro selecionado">Saída</div>
+                    <div class="EntradaFiltro filtro selecionado">Entrada</div>
+                `;
+
+    categoriasSet.forEach((el) => {
+        const html = `<div class="filtro selecionado">${el.trim()}</div>`;
+
+        document
+            .querySelector(".filtrar")
+            .insertAdjacentHTML("beforeend", html);
+    });
+}
+if (document.querySelector("#classificar")) {
+    document.querySelector("#classificar").addEventListener("input", () => {
+        classificar();
+    });
+}
+
+function classificar() {
+    const classificado = Number(document.querySelector("#classificar").value);
+    const datas = [];
+    document.querySelectorAll("tbody tr").forEach((el, i) => {
+        const dataStr = el.querySelector(".data").textContent.trim();
+        const partesData = dataStr.split("/");
+        const dataObj = new Date(
+            `${partesData[2]},${partesData[1]},${partesData[0]}`
+        );
+        datas.push({
+            data: dataObj,
+            index: i,
+            valor: Number(el.querySelector(".valor").textContent),
+            row: el,
+        });
+    });
+
+    switch (classificado) {
+        case 1:
+            datas.sort((a, b) => {
+                return b.data - a.data;
+            });
+            break;
+
+        case 2:
+            datas.sort((a, b) => {
+                return a.data - b.data;
+            });
+
+            break;
+        case 3:
+            datas.sort((a, b) => {
+                return b.valor - a.valor;
+            });
+
+            break;
+        case 4:
+            datas.sort((a, b) => {
+                return a.valor - b.valor;
+            });
+
+            break;
+
+        default:
+            break;
+    }
+
+    const tbody = document.querySelector("tbody");
+    tbody.innerHTML = "";
+    datas.forEach((el) => {
+        tbody.appendChild(el.row);
+    });
+}
+
+function setMesesAnos() {
+    const monthNames = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+    ];
+
+    const meses = [];
+    const anos = [];
+
+    document.querySelectorAll("tbody tr .data").forEach((el) => {
+        const partesData = el.textContent.trim().split("/");
+
+        const mes = new Date(
+            `${partesData[2]}-${partesData[1]}-${partesData[0]}`
+        ).getMonth();
+        const ano = new Date(
+            `${partesData[2]}-${partesData[1]}-${partesData[0]}`
+        ).getFullYear();
+
+        meses.push(mes);
+        anos.push(ano);
+    });
+
+    meses.sort((a, b) => a - b);
+    anos.sort((a, b) => a - b);
+
+    const mesesSet = new Set(meses);
+    const anosSet = new Set(anos);
+
+    document.querySelector(
+        "#visualizarMeses"
+    ).innerHTML = `<option value="todos">Todos</option>`;
+    document.querySelector(
+        "#visualizarAnos"
+    ).innerHTML = `<option value="todos">Todos</option>`;
+
+    mesesSet.forEach((el) => {
+        const html = `<option value="${el}">${monthNames[el]}</option>`;
+        document
+            .querySelector("#visualizarMeses")
+            .insertAdjacentHTML("beforeend", html);
+    });
+
+    anosSet.forEach((el) => {
+        const html = `<option value="${el}">${el}</option>`;
+        document
+            .querySelector("#visualizarAnos")
+            .insertAdjacentHTML("beforeend", html);
+    });
+
+    const visualizarMeses = document.querySelector("#visualizarMeses");
+    visualizarMeses.addEventListener("input", () => {
+        const mes = visualizarMeses.value;
+        if (mes == "todos") {
+            document.querySelectorAll("tbody tr").forEach((el) => {
+                el.classList.remove("hidden2");
+            });
+            getSaldo();
+            classificar();
+            return;
+        }
+
+        document.querySelectorAll("tbody tr").forEach((el) => {
+            if (!el.querySelector(`.mes${mes}`)) {
+                return el.classList.add("hidden2");
+            }
+
+            el.classList.remove("hidden2");
+        });
+        getSaldo();
+        classificar();
+    });
+
+    const visualizarAnos = document.querySelector("#visualizarAnos");
+    visualizarAnos.addEventListener("input", () => {
+        const ano = visualizarAnos.value;
+
+        if (ano == "todos") {
+            document.querySelectorAll("tbody tr").forEach((el) => {
+                el.classList.remove("hidden3");
+            });
+            getSaldo();
+            classificar();
+            return;
+        }
+
+        document.querySelectorAll("tbody tr").forEach((el) => {
+            if (!el.querySelector(`.ano${ano}`)) {
+                return el.classList.add("hidden3");
+            }
+
+            el.classList.remove("hidden3");
+        });
+        getSaldo();
+        classificar();
+    });
+}
