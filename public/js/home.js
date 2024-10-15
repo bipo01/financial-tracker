@@ -17,7 +17,7 @@ addForm.addEventListener("submit", async (e) => {
     }
 
     const response = await fetch(
-        `https://financial-tracker-zeta.vercel.app/add`,
+        `https://financial-tracker-wo0l.onrender.com/add`,
         {
             method: "post",
             body: urlParams,
@@ -86,7 +86,7 @@ document.addEventListener("click", async (e) => {
         const urlParams = new URLSearchParams(formData);
 
         const response = await fetch(
-            `https://financial-tracker-zeta.vercel.app/deletar`,
+            `https://financial-tracker-wo0l.onrender.com/deletar`,
             {
                 method: "post",
                 body: urlParams,
@@ -140,7 +140,7 @@ document.addEventListener("click", async (e) => {
             const categoriaEd = tr.querySelector("#categoriaEd").value.trim();
 
             const response = await fetch(
-                `https://financial-tracker-zeta.vercel.app/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
+                `https://financial-tracker-wo0l.onrender.com/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
             );
             const data = await response.json();
 
