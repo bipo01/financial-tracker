@@ -22,7 +22,6 @@
             <h2 class="mb-4 text-center">Gerenciador Financeiro</h2>
             <form id="addForm" action="/add" method="post" class="row g-3">
                 <div class="col-md-3">
-                    <label for="valor" class="form-label">Valor</label>
                     <input
                         type="number"
                         name="valor"
@@ -32,7 +31,6 @@
                     />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Tipo</label><br />
                     <div class="form-check form-check-inline">
                         <input
                             type="radio"
@@ -60,7 +58,6 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <label for="categoria" class="form-label">Categoria</label>
                     <input
                         type="text"
                         name="categoria"
@@ -70,7 +67,6 @@
                     />
                 </div>
                 <div class="col-md-3">
-                    <label for="data" class="form-label">Data</label>
                     <input
                         type="date"
                         name="data"
@@ -78,36 +74,42 @@
                         class="form-control"
                     />
                 </div>
-                <div class="col-12">
+                <div id="divAddBtn" class="col-12">
                     <button type="submit" class="btn btn-primary w-100">
                         Adicionar
                     </button>
                 </div>
             </form>
 
-            <div class="filtrar">
-                <div class="SaídaFiltro filtro selecionado">Saída</div>
-                <div class="EntradaFiltro filtro selecionado">Entrada</div>
+            <div class="divFiltrar">
+                <p>Filtrar:</p>
+                <div class="filtrar">
+                    <div class="SaídaFiltro filtro selecionado">Saída</div>
+                    <div class="EntradaFiltro filtro selecionado">Entrada</div>
+                </div>
             </div>
 
-            <div class="div-classificar">
-                Classificar por:
-                <select id="classificar">
-                    <option value="1">Mais recente</option>
-                    <option value="2">Mais antigo</option>
-                    <option value="3">Maior valor</option>
-                    <option value="4">Menor valor</option>
-                </select>
-            </div>
+            <div class="divClassificarVisualizar">
+                <div class="div-classificar">
+                    Classificar por:
+                    <select id="classificar">
+                        <option value="1">Mais recente</option>
+                        <option value="2">Mais antigo</option>
+                        <option value="3">Maior valor</option>
+                        <option value="4">Menor valor</option>
+                    </select>
+                </div>
 
-            <div class="div-visualizar">
-                Visualizar:
-                <select id="visualizarMeses">
-                    <option value="todos">Todos</option>
-                </select>
-                <select id="visualizarAnos">
-                    <option value="todos">Todos</option>
-                </select>
+                <div class="div-visualizar">
+                    Visualizar: Mês
+                    <select id="visualizarMeses">
+                        <option value="todos">Todos</option>
+                    </select>
+                    Ano
+                    <select id="visualizarAnos">
+                        <option value="todos">Todos</option>
+                    </select>
+                </div>
             </div>
 
             <div class="table-responsive mt-5">
@@ -178,13 +180,11 @@
                     </tfoot>
                 </table>
             </div>
-            <canvas
-                class="hidden"
-                id="myChart"
-                style="width: 100%; max-width: 700px"
-            ></canvas>
-
-            <a href="/logout">Sair</a>
+            <div class="charts">
+                <canvas class="hidden" id="myChart"></canvas>
+                <canvas class="hidden" id="myChart1"></canvas>
+            </div>
+            <a id="btnSair" href="/logout">Sair</a>
         </div>
 
         <script

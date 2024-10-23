@@ -10,7 +10,17 @@ h2 {
 
 .table {
     margin-top: 20px;
-    border: 1px solid #dee2e6;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid white;
+    outline: none;
+}
+
+.table-responsive {
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.234);
 }
 
 .btn-primary {
@@ -45,13 +55,42 @@ tr select {
     background: none;
 }
 
+#addForm {
+    margin: 10px 0;
+    background: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.201);
+    border: 1px solid rgba(0, 0, 0, 0.234);
+}
+
+#addForm div {
+    text-align: center;
+    margin: 10px 0;
+}
+
 .filtrar {
     display: flex;
-    margin: 10px 0;
-    padding: 1rem 1.5rem;
+    margin: 5px 0;
+    padding: 0.2rem 1rem;
     border-radius: 10px;
     max-width: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
+}
+
+.divFiltrar {
+    background: white;
+    margin: 20px 0;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.201);
+    border: 1px solid rgba(0, 0, 0, 0.234);
+}
+
+.divFiltrar p {
+    margin: 5px 0;
 }
 
 .filtro {
@@ -66,12 +105,45 @@ tr select {
     background: gray;
 }
 
+.divClassificarVisualizar {
+    background: white;
+    display: flex;
+    gap: 1.5rem;
+    margin: 20px 0;
+    padding: 1rem 1rem;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.201);
+    border: 1px solid rgba(0, 0, 0, 0.234);
+}
+
+.divClassificarVisualizar select {
+    border: 3px solid rgba(0, 0, 0, 0.064);
+    padding: 0.5rem;
+    border-radius: 5px;
+    outline: none;
+}
+
 #myChart {
     background: rgba(156, 194, 236, 0.987);
     margin: 10px auto;
-    padding: 0.5rem 1.5rem;
+    padding: 1rem 1.5rem;
     border-radius: 15px;
-    width: fit-content;
+    width: min-content;
+    max-width: 650px;
+}
+#myChart1 {
+    background: rgba(156, 193, 236, 0.47);
+    margin: 10px auto;
+    padding: 1rem 1.5rem;
+    border-radius: 15px;
+    width: min-content;
+    max-width: 650px;
+}
+
+.charts {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
 }
 
 .table-striped > tbody > tr.trEntrada > td {
@@ -80,6 +152,28 @@ tr select {
 
 .table-striped > tbody > tr.trSaída > td {
     background-color: rgb(236, 126, 126) !important;
+}
+
+tbody tr {
+    font-size: 1.1rem;
+}
+
+.deletarLinha button {
+    background: none;
+    border: none;
+    outline: none;
+    width: fit-content;
+}
+
+#btnSair {
+    color: red;
+    margin: 50px auto;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .selecionado {
@@ -98,7 +192,7 @@ tr select {
 
 .deletarLinha {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
 }
 
 .hidden {

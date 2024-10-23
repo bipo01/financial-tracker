@@ -2,6 +2,7 @@ const addForm = document.querySelector("#addForm");
 const deletarForm = document.querySelectorAll(".deletarForm");
 let categoriasSet;
 let myChart;
+let myChart1;
 
 addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -130,14 +131,24 @@ document.addEventListener("click", async (e) => {
         const idAtual = tr.querySelector("#idAtual").value;
 
         const valorAtual = tr.children[1].textContent;
-        const categoriaAtual = tr.children[2].textContent;
+        const categoriaAtual = tr.children[2].textContent.trim();
         const tipoAtual = tr.children[0].textContent;
 
+        console.log(categoriaAtual);
+        const categoriaAtual1 = categoriaAtual;
+
         if (tr.classList.contains("editando")) {
+            console.log("editando");
             const tipoEd = tr.querySelector("#tipoEd").value.trim();
             const dataEd = tr.querySelector("#dataEd").value.trim();
             const valorEd = tr.querySelector("#valorEd").value.trim();
             const categoriaEd = tr.querySelector("#categoriaEd").value.trim();
+
+            document.querySelectorAll(".allCategorias").forEach((el) => {
+                if (el.textContent.trim() == categoriaAtual) {
+                    console.log(el);
+                }
+            });
 
             const response = await fetch(
                 `https://financial-tracker-wo0l.onrender.com/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
@@ -182,6 +193,7 @@ document.addEventListener("click", async (e) => {
             getSaldo();
             createChart();
             classificar();
+            setMesesAnos();
             return;
         }
 
@@ -389,6 +401,10 @@ function createChart() {
         myChart.destroy();
     }
 
+    if (myChart1) {
+        myChart1.destroy();
+    }
+
     myChart = new Chart("myChart", {
         type: "pie",
         data: {
@@ -401,27 +417,94 @@ function createChart() {
             ],
         },
     });
+
+    let entradasArr = [];
+    let saidasArr = [];
+
+    document.querySelectorAll(".Entrada").forEach((el) => {
+        const valor = Number(
+            el.closest("tr").querySelector(".valor").textContent
+        );
+        console.log(valor);
+        entradasArr.push(valor);
+    });
+
+    document.querySelectorAll(".Saída").forEach((el) => {
+        const valor = Number(
+            el.closest("tr").querySelector(".valor").textContent
+        );
+        console.log(valor);
+        saidasArr.push(valor);
+    });
+
+    let entradasTotal;
+    let saidasTotal;
+
+    if (entradasArr.length > 0) {
+        entradasTotal = entradasArr.reduce((acc, cur) => {
+            return acc + cur;
+        }, 0);
+    }
+    if (saidasArr.length > 0) {
+        saidasTotal = saidasArr.reduce((acc, cur) => {
+            return acc + cur;
+        }, 0);
+    }
+
+    console.log(entradasTotal);
+    console.log(saidasTotal);
+
+    entradasTotal = entradasTotal || 0;
+    saidasTotal = saidasTotal || 0;
+
+    const valorMax = entradasTotal + entradasTotal / 2;
+
+    var xValues1 = ["Entradas", "Saídas"];
+    var yValues1 = [entradasTotal, saidasTotal, 0];
+    var barColors1 = ["green", "red"];
+
+    myChart1 = new Chart("myChart1", {
+        type: "bar",
+        data: {
+            labels: xValues1,
+            datasets: [
+                {
+                    backgroundColor: barColors1,
+                    data: yValues1,
+                },
+            ],
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: false,
+            },
+        },
+    });
+
     const tbody = document.querySelector("tbody");
 
     document.querySelector("#myChart").classList.remove("hidden");
+    document.querySelector("#myChart1").classList.remove("hidden");
 
     if (!tbody.children.length) {
         myChart.destroy();
+        myChart1.destroy();
         document.querySelector("#myChart").classList.add("hidden");
+        document.querySelector("#myChart1").classList.add("hidden");
     }
 }
 
 function setCategories() {
-    let allCategorias = document.querySelectorAll(".allCategorias");
-    let categoriasArr = [];
-
-    allCategorias.forEach((el) => {
-        categoriasArr.push(el.textContent.trim());
+    let categoriasArray = [];
+    document.querySelectorAll("tbody tr").forEach((el) => {
+        const categoria = el.children[2].textContent.trim();
+        categoriasArray.push(categoria);
     });
 
-    categoriasArr.sort();
+    categoriasArray.sort();
 
-    categoriasSet = new Set(categoriasArr);
+    categoriasSet = new Set(categoriasArray);
 
     document.querySelector(".filtrar").innerHTML = `
                     <div class="SaídaFiltro filtro selecionado">Saída</div>
