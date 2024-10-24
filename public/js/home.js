@@ -18,7 +18,7 @@ addForm.addEventListener("submit", async (e) => {
     }
 
     const response = await fetch(
-        `https://financial-tracker-wo0l.onrender.com/add`,
+        `https://financial-tracker-wine.vercel.app/add`,
         {
             method: "post",
             body: urlParams,
@@ -87,7 +87,7 @@ document.addEventListener("click", async (e) => {
         const urlParams = new URLSearchParams(formData);
 
         const response = await fetch(
-            `https://financial-tracker-wo0l.onrender.com/deletar`,
+            `https://financial-tracker-wine.vercel.app/deletar`,
             {
                 method: "post",
                 body: urlParams,
@@ -151,7 +151,7 @@ document.addEventListener("click", async (e) => {
             });
 
             const response = await fetch(
-                `https://financial-tracker-wo0l.onrender.com/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
+                `https://financial-tracker-wine.vercel.app/editar?tipoEd=${tipoEd}&categoriaEd=${categoriaEd}&valorEd=${valorEd}&dataEd=${dataEd}&idAtual=${idAtual}`
             );
             const data = await response.json();
 

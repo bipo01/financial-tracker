@@ -1,6 +1,6 @@
 /* styles.css */
 body {
-    background-color: #f8f9fa;
+    background-color: #252a41;
     font-family: "Poppins", sans-serif;
 }
 
@@ -144,6 +144,11 @@ tr select {
     display: flex;
     width: 100%;
     overflow-x: auto;
+    background: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.201);
+    border: 1px solid rgba(0, 0, 0, 0.234);
 }
 
 .table-striped > tbody > tr.trEntrada > td {

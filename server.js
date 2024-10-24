@@ -5,18 +5,15 @@ import pg from "pg";
 import cors from "cors";
 import { fileURLToPath } from "url";
 import path from "path";
+import env from "dotenv";
+
+env.config();
 
 const app = express();
 const port = 3000;
 
 const db = new pg.Client({
-    // user: "postgres",
-    // password: "JSBispo121511!",
-    // database: "projetos",
-    // host: "localhost",
-    // port: 5432,
-    connectionString:
-        "postgres://default:Ef7gRnhwbD9B@ep-bold-limit-a48ldweb.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require",
+    connectionString: process.env.PG_URL,
 });
 db.connect();
 
