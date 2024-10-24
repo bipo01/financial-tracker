@@ -96,7 +96,7 @@ document.addEventListener("click", async (e) => {
         const data = await response.json();
 
         tr.remove();
-
+        //teste
         const categoria = tr.children[2].textContent;
         document.querySelectorAll(".allCategorias").forEach((el) => {
             const categoriasExistentes = [];
